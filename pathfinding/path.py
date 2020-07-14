@@ -76,6 +76,9 @@ class Application(Frame):
         y1 = y0 + self.size
         self.canvas.create_rectangle(x0, y0, x1, y1, outline="black", fill="red", tags="start")
 
+    def create_walls(self):
+        pass
+
 
 if __name__ == "__main__":
     root = Tk()
