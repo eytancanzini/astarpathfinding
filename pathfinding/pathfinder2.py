@@ -2,6 +2,11 @@ import pygame as pg
 from nodes import HomeNode, ExitNode
 
 
+def heuristic(a, b):
+    (x1, y1) = a
+    (x2, y2) = b
+    return abs(x1-x2) + abs(y1-y2)
+
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
@@ -64,6 +69,8 @@ while not done:
         elif event.type == pg.KEYDOWN:
             if event.key == pg.K_RETURN:
                 print("Enter pressed")
+                while home_node.get_row() is not exit_node.get_row() and home_node.get_column() is not exit_node.get_column():
+                    print("Waiting for algorithm")
 
     screen.fill(BLACK)
 
