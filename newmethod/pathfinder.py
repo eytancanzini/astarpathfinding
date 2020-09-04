@@ -98,6 +98,13 @@ def h(p1, p2):
     return abs(x1-x2) + abs(y1-y2)
 
 
+def reconstruct_path(came_from, current, draw):
+    while current in came_from:
+        current = came_from[current]
+        current.make_path()
+        draw()
+
+
 def algorithm(draw, grid, start, end):
     count = 0
     open_set = PriorityQueue()
@@ -118,6 +125,9 @@ def algorithm(draw, grid, start, end):
         open_set_hash.remove(current)  # Removing duplicates
 
         if current == end:
+            reconstruct_path(came_from, end, draw)
+            end.make_end()
+            start.make_start()
             return True  # Make path
 
         for neighbour in current.neighbours:
@@ -185,14 +195,11 @@ def main(win, width):
     end = None
 
     run = True
-    started = False
     while run:
         draw(win, grid, ROWS, width)
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 run = False
-            if started:
-                continue
             if pg.mouse.get_pressed()[0] == 1:  # Left mouse button
                 pos = pg.mouse.get_pos()
                 row, col = get_clicked_pos(pos, ROWS, width)
@@ -215,12 +222,16 @@ def main(win, width):
                 elif node == end:
                     end = None
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_SPACE and not started:
+                if event.key == pg.K_SPACE and start and end:
                     for row in grid:
                         for node in row:
-                            node.update_neighbours()
+                            node.update_neighbours(grid)
                     algorithm(lambda: draw(win, grid, ROWS, width),
                               grid, start, end)
+                if event.key == pg.K_c:
+                    start = None
+                    end = None
+                    grid = make_grid(ROWS, width)
     pg.quit()
 
 
