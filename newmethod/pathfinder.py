@@ -2,6 +2,8 @@ import pygame as pg
 import math
 from queue import PriorityQueue
 
+pg.init()
+
 WIDTH = 800
 WIN = pg.display.set_mode((WIDTH, WIDTH))
 pg.display.set_caption("A* Pathfinding Algorithm")
@@ -13,7 +15,8 @@ YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 PURPLE = (128, 0, 128)
-ORANGE = (128, 128, 128)
+ORANGE = (255, 165, 0)
+GREY = (128, 128, 128)
 TURQUOISE = (64, 224, 208)
 
 
@@ -28,7 +31,7 @@ class Node:
         self.width = width
         self.total_rows = total_rows
 
-    def get_post(self):
+    def get_pos(self):
         return self.row, self.col
 
     def is_closed(self):
@@ -48,6 +51,9 @@ class Node:
 
     def reset(self):
         self.color = WHITE
+
+    def make_start(self):
+        self.color = ORANGE
 
     def make_closed(self):
         self.color = RED
@@ -107,3 +113,48 @@ def draw(win, grid, rows, width):
 
     draw_grid(win, rows, width)
     pg.display.update()
+
+
+def get_clicked_pos(pos, rows, width):
+    gap = width // rows
+    y, x = pos
+    row = y // gap
+    col = x // gap
+    return row, col
+
+
+def main(win, width):
+    ROWS = 50
+    grid = make_grid(ROWS, width)
+
+    start = None
+    end = None
+
+    run = True
+    started = False
+    while run:
+        draw(win, grid, ROWS, width)
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                run = False
+            if started:
+                continue
+            if pg.mouse.get_pressed()[0] == 1:  # Left mouse button
+                pos = pg.mouse.get_pos()
+                row, col = get_clicked_pos(pos, ROWS, width)
+                node = grid[row][col]
+                if not start:
+                    start = node
+                    start.make_start()
+                elif not end and node != start:
+                    end = node
+                    end.make_end()
+                elif node != end and node != start:
+                    node.make_barrier()
+            elif pg.mouse.get_pressed()[2] == 1:  # Right Mouse button
+                pass
+    pg.quit()
+
+
+if __name__ == '__main__':
+    main(WIN, WIDTH)
